@@ -1,6 +1,6 @@
 {
   "name": "MMM-homeassistant-sensors",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Pull Home Assistant Sensor information to the Magic Mirror",
   "repository": {
     "type": "git",
@@ -16,8 +16,6 @@
   "author": "Erik Pettersson",
   "license": "MIT",
   "dependencies": {
-    "@mdi/font": "latest",
-    "request": "*",
-    "chart.js": "^4.1.1"
+    "@mdi/font": "latest"
   }
 }

@@ -1,13 +1,14 @@
-> The NPM module "Request" was removed with MagicMirror `v2.16` This has
-> led to the fact that MagicMirror can no longer be started under
-> Docker, for example. With this fork, the deprecated npm module
-> "Request" is installed locally in the module's directory.
-
 # MMM-homeassistant-sensors
 
 This a module for the [MagicMirror²](https://magicmirror.builders/). 
 
 This module can display information from [Home Assistant](https://home-assistant.io/) using the home assistant REST API.
+
+*Potential breaking changes!*
+
+*The "control" sensor is moved to the "values" block of the config!*
+
+*Read blow how to configure it!*
 
 ### Screen shots
 
@@ -67,8 +68,6 @@ The configuration can be very simple, from just displaying a simple value from a
 | `fade`               | No | `100` | When updating the values, this is the time (in milliseconds) the "table" fades out and in again.|
 | `updateInterval`     | No | `300000` | The time between updates (in milliseconds) (300000 = 5 minutes).|
 | `id`                 | No | `false` | If you want to refresh the values on this specific instance from HA via notifications, send "REFRESHVALUESX" (X = your id). If you send just "REFRESHVALUES" all instances values will be refreshed.|
-| `controlsensor`      | No | `'sensor control disabled'` | The HA sensor you want to use to trigger to show the module when the defined value is present.|
-| `controlsensorvalue` | No | `'sensor control disabled'` | The value the above HA sensor must have to show the module. A boolean here is a good way to show and hide the module.|
 | `displaySymbol`      | No | `true` | If you don't want either "icons" nor "pictures" in your list, set it to false.|
 | `displaydates`       | No | `false` | If you want to show dates for last update by default. This can be turned off or on for each sensor as well.|
 | `displaytimes`       | No | `false` | If you want to show times for last update by default. This can be turned off or on for each sensor as well.|
@@ -101,10 +100,13 @@ The configuration can be very simple, from just displaying a simple value from a
 | `highDisplayClass`       | `string` | You can specify a class for the high value, if the value of the sensor is higher then the highAlertThreshold this class will be used.|
 | `lowDisplayClass`        | `string` | You can specify a class for the low value, if the value of the sensor is lower then the lowAlertThreshold this class will be used.|
 | `displayWhenEqualTo`     | `string` | You can specify a string/number/boolian, if the value/state of the sensor is equal to what's specified the sensor will be shown in the table.|
-| `icons`                  | `array` | Define specific icons for spesific values/states (see example below). You can use the icon names from the: [MaterialDesignIcons](https://materialdesignicons.com/).|
-| `replace`                | `array` | Define specific values/states that will be owerriden by the specified values.|
+| `icons`                  | `array` | Define specific icons for specific values/states (see example below). You can use the icon names from the: [MaterialDesignIcons](https://materialdesignicons.com/).|
+| `replace`                | `array` | Define specific values/states that will be overridden by the specified values.|
 | `notificationName`       | `string` | Name of the notification to send from this notification. Example: "Home" |
 | `notificationConditions` | `array` | See section below for details. This is required to send a notification. |
+| `control`                | `boolean` | Set to true if you want to use this sensor to trigger to show the module when the defined value is present.|
+| `controlvalue`           | `string`| The value the control HA sensor must have to show the module. An on/off here is a good way to show and hide the module.|
+| `display`                | `boolean`| If set to false, the sensor will not be added to the table (not shown), you may want to do this if this is the "control" sensor.|
 
 ## NotificationConditions options
 | Option               | Required | Type | Description |

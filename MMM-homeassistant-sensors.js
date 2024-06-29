@@ -21,19 +21,15 @@ Module.register("MMM-homeassistant-sensors", {
 		notificationCondition: [],
 		dateformat: 'YYYY-MM-DD', // See moments for more format options: https://momentjs.com/docs/#/displaying/
 		timeformat: 'HH:mm:ss', // See moments for more format options: https://momentjs.com/docs/#/displaying/
-		controlsensor: 'sensor control disabled', // If you want to show this instans of HA-Sensors only when this sensor is the value below.
-		controlsensorvalue: 'sensor control disabled', // The value the above sensor must have to show this instans of HA-Sensors.
 		noaddress: 'away', // If address field is "undefined" or "null" on the sensor, this string will be displayed instead of the address.
 		debuglogging: false,
 		rowClass: 'small', // small, normal or big
-		values: []
+		values: [] // All the sensors and options...
 	},
 
-	// Load the moment script (from MM) and chart.js from the module.
+	// Load the moment script (from MM).
 	getScripts: function () {
 		return ["moment.js"];
-		// Use this when Chart.js is needed (and installed via npm). 
-		//return ["moment.js", this.file('node_modules/chart.js/dist/chart.js')];
 	},
 
 	// Load the css script from the module.
@@ -78,44 +74,59 @@ Module.register("MMM-homeassistant-sensors", {
 		if(this.config.notificationOnly) {
 			wrapper.style.display = "none";
 		}
-		// Hides and shows the module if the control sensor is defined and the control sensor value is defined.
+		// Hides and shows the module if the control sensor set to true are defined and the control sensor value is defined.
 		else if (data && !this.isEmpty(data)) {
-			// If the control sensor is set to anything else the the default continue.
-			if (this.config.controlsensor !== "sensor control disabled") {
-				var stateval = this.getState(data, this.config.controlsensor);
-				// If the control sensor value is anything not the default or not the defined value, hide the module.
-				if ((stateval !== this.config.controlsensorvalue && this.config.controlsensorvalue !== "sensor control disabled")) {
-					if (!this.hidden) {
-						this.hide();
-					}
-				} else {
-					if (this.hidden) {
-						this.show();
+			// Check if you have a control-sensor set.
+			var values = this.config.values;
+			if (values.length > 0) {
+				for (var i = 0; i < values.length; i++) {
+					// Check if there a control sensor in the config.
+					if (values[i].control) {
+						if (data.length > 0) {
+							for (var s = 0; i < data.length; i++) {
+								// If we do...
+								if (data[s].entity_id == values[i].sensor) {
+									// Check if the state is the same as the control-state.
+									if (data[s].state !==  values[i].controlvalue) {
+										// Hide the module if it's not the same.
+										if (!this.hidden) {
+											this.hide();
+										}
+									} else {
+										// Show the module if it's the same.
+										if (this.hidden) {
+											this.show();
+										}
+									}
+								}
+							}
+						}
 					}
 				}
+			}
+
 /*
-				// *****************************************************************************************
-				//
-				// This below is not working for me, I'm not using pages...
-				// For anyone using pages, please fix so that it works both with and without MMM-Pages... :)
-				// 
-				// *****************************************************************************************
-					// this.hide() does not work well with MMM-Pages, so use wrapper.style.display instead
-					if (wrapper.style.display != "none") {
-						this.visibleStyle = wrapper.style.display;
-						wrapper.style.display = "none";
-					}
-				} else {
-					console.log("here 2");
-					if (wrapper.style.display == "none") {
-						wrapper.style.display = this.visibleStyle;
-					}
+			// *****************************************************************************************
+			//
+			// This below is not working for me, I'm not using pages...
+			// For anyone using pages, please fix so that it works both with and without MMM-Pages... :)
+			// 
+			// *****************************************************************************************
+				// this.hide() does not work well with MMM-Pages, so use wrapper.style.display instead
+				if (wrapper.style.display != "none") {
+					this.visibleStyle = wrapper.style.display;
+					wrapper.style.display = "none";
 				}
+			} else {
+				console.log("here 2");
+				if (wrapper.style.display == "none") {
+					wrapper.style.display = this.visibleStyle;
+				}
+			}
 				// *****************************************************************************************
 */
-			}
-		}
 
+		}
 		// Starting to build the elements.
 		var statElement = document.createElement("header");
 		var title = this.config.title;
@@ -125,9 +136,15 @@ Module.register("MMM-homeassistant-sensors", {
 		if (data && !this.isEmpty(data)) {
 			var tableElement = document.createElement("table");
 
-			var values = this.config.values;
+			//var values = this.config.values;
 			if (values.length > 0) {
 				for (var i = 0; i < values.length; i++) {
+
+					// Check if the sensor should be displayed in the table at all.
+					// This is useful to set to false if you don't want the "display-sensor" to show in the table. 
+					if (values[i].display == false) {
+						 continue;
+					}
 
 					// Check if there is icons in the config.
 					if (values[i].icons) {
@@ -760,6 +777,7 @@ Module.register("MMM-homeassistant-sensors", {
 		if (notification === "STATS_RESULT" && this.identifier == payload.id) {
 			this.result = payload.data;
 			this.updateDom(this.config.fade);
+			//console.log(payload.data);
 		}
 	},
 });
