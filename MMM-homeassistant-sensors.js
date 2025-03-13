@@ -681,11 +681,17 @@ Module.register("MMM-homeassistant-sensors", {
 				newValue = newValue * sensordata[12];
 			}
 
-			// Round the value to two decimals.
-			// Todo: Add a better function for this...
-			if (sensordata[13]) {
-				newValue = Math.round(newValue * 100) / 100;
-			}
+			// Round the value based on sensordata[13] setting
+            if (sensordata[13] !== undefined && sensordata[13] !== null) {
+                if (typeof sensordata[13] === 'boolean' && sensordata[13]) {
+                    // Legacy behavior - round to 2 decimal places
+                    newValue = Math.round(newValue * 100) / 100;
+                } else if (typeof sensordata[13] === 'number' && sensordata[13] >= 0) {
+                    // New behavior - round to specified decimal places
+                    const factor = Math.pow(10, sensordata[13]);
+                    newValue = Math.round(newValue * factor) / factor;
+                }
+            }
 
 			// If you want to add the value to the defined unit.
 			if (sensordata[5] !== "none") {
